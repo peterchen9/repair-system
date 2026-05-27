@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model RepairItem {
+  id                  Int                   @id @default(autoincrement())
+  receivedDate        DateTime
+  customerName        String
+  customerPhone       String
+  itemName            String
+  problemDescription  String
+  photoUrl            String?
+  completionPreference String
+  status              String                @default("PENDING")
+  repairRecords       RepairRecord[]
+  statusHistories     RepairStatusHistory[]
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+}
+
+model RepairRecord {
+  id                Int               @id @default(autoincrement())
+  repairItemId      Int
+  repairItem        RepairItem        @relation(fields: [repairItemId], references: [id], onDelete: Cascade)
+  acceptedDate      DateTime?
+  technicianName    String
+  initialDiagnosis  String?
+  repairable        String            @default("UNKNOWN")
+  startedAt         DateTime?
+  completedAt       DateTime?
+  notifiedAt        DateTime?
+  notes             String?
+  closeReason       String?
+  partTransactions  PartTransaction[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+model Part {
+  id               Int               @id @default(autoincrement())
+  name             String
+  quantity         Int               @default(0)
+  safetyStock      Int               @default(0)
+  unitPrice        Float             @default(0)
+  purchaseSource   String?
+  vendor           String?
+  stockInDate      DateTime?
+  stockOutDate     DateTime?
+  photoUrl         String?
+  notes            String?
+  transactions     PartTransaction[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model PartTransaction {
+  id              Int                 @id @default(autoincrement())
+  partId          Int
+  part            Part                @relation(fields: [partId], references: [id], onDelete: Cascade)
+  repairRecordId  Int?
+  repairRecord    RepairRecord?       @relation(fields: [repairRecordId], references: [id], onDelete: SetNull)
+  type            String
+  quantity        Int
+  unitPrice       Float?
+  transactionDate DateTime
+  notes           String?
+  createdAt       DateTime            @default(now())
+}
+
+model RepairStatusHistory {
+  id           Int          @id @default(autoincrement())
+  repairItemId Int
+  repairItem   RepairItem   @relation(fields: [repairItemId], references: [id], onDelete: Cascade)
+  fromStatus   String?
+  toStatus     String
+  changedBy    String?
+  reason       String?
+  changedAt    DateTime     @default(now())
+}
