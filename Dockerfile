@@ -17,4 +17,4 @@ COPY --from=build /app/server ./server
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 EXPOSE 4000
-CMD ["sh", "-c", "npx prisma migrate deploy && node prisma/seed.js && node server/src/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node server/src/index.js"]

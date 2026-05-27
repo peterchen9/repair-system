@@ -1,20 +1,28 @@
 name: repair-system
 
 services:
-  app:
+  repair-system-app:
     build: .
-    container_name: repair-system
+    container_name: repair-system-app
     ports:
-      - "4000:4000"
+      - "${HOST_PORT:-8240}:4000"
     environment:
-      DATABASE_URL: "file:/app/data/dev.db"
-      PORT: "4000"
-      CLIENT_ORIGIN: "http://localhost:4000"
+      DATABASE_URL: "${DATABASE_URL:-file:/app/data/repair-system.db}"
+      PORT: "${PORT:-4000}"
+      CLIENT_ORIGIN: "${CLIENT_ORIGIN:-http://localhost:8240}"
     volumes:
-      - repair_sqlite:/app/data
-      - repair_uploads:/app/server/src/uploads
+      - repair-system-data:/app/data
+      - repair-system-uploads:/app/server/src/uploads
+    networks:
+      - repair-system-network
     restart: unless-stopped
 
 volumes:
-  repair_sqlite:
-  repair_uploads:
+  repair-system-data:
+    name: repair-system-data
+  repair-system-uploads:
+    name: repair-system-uploads
+
+networks:
+  repair-system-network:
+    name: repair-system-network

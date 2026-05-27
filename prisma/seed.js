@@ -14,6 +14,7 @@ async function main() {
         customerPhone: "0912-345-678",
         itemName: "電風扇",
         problemDescription: "啟動後不轉，有嗡嗡聲",
+        trackingCode: "RS-20260501-FAN",
         completionPreference: "PICKUP",
         status: "REPAIRING"
       }
@@ -25,6 +26,7 @@ async function main() {
         customerPhone: "0922-111-222",
         itemName: "電子鍋",
         problemDescription: "無法加熱，面板燈號正常",
+        trackingCode: "RS-20260503-RICE",
         completionPreference: "DONATE",
         status: "UNREPAIRABLE"
       }
@@ -36,6 +38,7 @@ async function main() {
         customerPhone: "0933-222-333",
         itemName: "檯燈",
         problemDescription: "開關接觸不良",
+        trackingCode: "RS-20260505-LAMP",
         completionPreference: "PICKUP",
         status: "PENDING"
       }

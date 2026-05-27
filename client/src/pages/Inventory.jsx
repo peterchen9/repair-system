@@ -16,7 +16,7 @@ export default function Inventory({ refreshKey, onChanged }) {
   const filtered = useMemo(() => {
     return items.filter((item) => {
       const okStatus = !status || item.status === status;
-      const okSearch = !search.trim() || `${item.itemName} ${item.customerName} ${item.customerPhone}`.includes(search.trim());
+      const okSearch = !search.trim() || `${item.itemName} ${item.customerName} ${item.customerPhone} ${item.trackingCode || ""}`.includes(search.trim());
       return okStatus && okSearch;
     });
   }, [items, status, search]);
@@ -42,7 +42,7 @@ export default function Inventory({ refreshKey, onChanged }) {
             <option value="">全部狀態</option>
             {statuses.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
           </select>
-          <input placeholder="搜尋品名、姓名、電話" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input placeholder="搜尋品名、姓名、電話、追蹤碼" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </Panel>
 
@@ -54,7 +54,10 @@ export default function Inventory({ refreshKey, onChanged }) {
                 <thead className="bg-slate-50 text-slate-500"><tr><th className="p-2">品名</th><th className="p-2">姓名</th><th className="p-2">處理方式</th><th className="p-2">狀態</th><th className="p-2">操作</th></tr></thead>
                 <tbody>{filtered.map((item) => (
                   <tr key={item.id} className="border-t border-slate-100">
-                    <td className="p-2 font-medium">{item.itemName}</td>
+                    <td className="p-2">
+                      <p className="font-medium">{item.itemName}</p>
+                      <p className="text-xs text-slate-500">{item.trackingCode || "尚無追蹤碼"}</p>
+                    </td>
                     <td className="p-2">{item.customerName}</td>
                     <td className="p-2">{completionLabel[item.completionPreference]}</td>
                     <td className="p-2"><StatusBadge status={item.status} /></td>

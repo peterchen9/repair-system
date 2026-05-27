@@ -10,6 +10,12 @@ const includeAll = {
   statusHistories: { orderBy: { changedAt: "desc" } }
 };
 
+function makeTrackingCode() {
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const random = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `RS-${stamp}-${random}`;
+}
+
 function itemData(body, file) {
   const data = {
     receivedDate: parseDate(body.receivedDate) || new Date(),
@@ -33,11 +39,22 @@ router.get("/", async (req, res, next) => {
       where.OR = [
         { customerName: { contains: req.query.search } },
         { itemName: { contains: req.query.search } },
-        { customerPhone: { contains: req.query.search } }
+        { customerPhone: { contains: req.query.search } },
+        { trackingCode: { contains: req.query.search } }
       ];
     }
     const items = await prisma.repairItem.findMany({ where, include: includeAll, orderBy: { createdAt: "desc" } });
     res.json(items);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/tracking/:code", async (req, res, next) => {
+  try {
+    const item = await prisma.repairItem.findUnique({ where: { trackingCode: req.params.code }, include: includeAll });
+    if (!item) return res.status(404).json({ message: "找不到維修品" });
+    res.json(item);
   } catch (error) {
     next(error);
   }
@@ -56,7 +73,7 @@ router.get("/:id", async (req, res, next) => {
 router.post("/", upload.single("photo"), async (req, res, next) => {
   try {
     const item = await prisma.$transaction(async (tx) => {
-      const created = await tx.repairItem.create({ data: itemData(req.body, req.file) });
+      const created = await tx.repairItem.create({ data: { ...itemData(req.body, req.file), trackingCode: makeTrackingCode() } });
       await tx.repairStatusHistory.create({
         data: { repairItemId: created.id, toStatus: created.status, changedBy: req.body.changedBy || "系統", reason: "建立待修品" }
       });

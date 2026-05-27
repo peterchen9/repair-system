@@ -13,9 +13,10 @@ router.get("/repair-items.csv", async (_req, res, next) => {
   try {
     const items = await prisma.repairItem.findMany({ orderBy: { createdAt: "desc" } });
     const rows = [
-      ["ID", "日期", "姓名", "電話", "待修品名稱", "故障問題", "處理方式", "狀態"],
+      ["ID", "追蹤碼", "日期", "姓名", "電話", "待修品名稱", "故障問題", "處理方式", "狀態"],
       ...items.map((item) => [
         item.id,
+        item.trackingCode,
         item.receivedDate.toISOString().slice(0, 10),
         item.customerName,
         item.customerPhone,

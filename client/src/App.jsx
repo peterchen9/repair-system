@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Boxes, ClipboardList, Gauge, PackageSearch, Wrench } from "lucide-react";
+import { Boxes, ClipboardList, ExternalLink, Gauge, PackageSearch, Wrench } from "lucide-react";
 import Dashboard from "./pages/Dashboard.jsx";
 import RepairItems from "./pages/RepairItems.jsx";
 import RepairRecords from "./pages/RepairRecords.jsx";
 import Parts from "./pages/Parts.jsx";
 import Inventory from "./pages/Inventory.jsx";
+import PublicRegister from "./pages/PublicRegister.jsx";
+import TrackItem from "./pages/TrackItem.jsx";
 
 const tabs = [
   ["dashboard", "儀表板", Gauge, Dashboard],
@@ -15,13 +17,21 @@ const tabs = [
 ];
 
 export default function App() {
+  const path = window.location.pathname;
+  if (path === "/register") return <PublicRegister />;
+  if (path.startsWith("/track/")) return <TrackItem />;
+  return <AdminApp />;
+}
+
+function AdminApp() {
   const [active, setActive] = useState("dashboard");
   const Current = tabs.find(([key]) => key === active)?.[3] || Dashboard;
   const [refreshKey, setRefreshKey] = useState(0);
   const refresh = () => setRefreshKey((key) => key + 1);
 
   useEffect(() => {
-    document.title = "重修舊好維修系統";
+    document.title = "重修舊好維修系統後台";
+    if (window.location.pathname === "/") window.history.replaceState(null, "", "/admin");
   }, []);
 
   return (
@@ -29,7 +39,11 @@ export default function App() {
       <aside className="border-b border-slate-200 bg-white lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:border-b-0 lg:border-r">
         <div className="px-5 py-5">
           <h1 className="text-2xl font-bold text-ink">重修舊好</h1>
-          <p className="mt-1 text-sm text-slate-500">維修系統 MVP</p>
+          <p className="mt-1 text-sm text-slate-500">維修系統後台</p>
+          <a className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-pine hover:underline" href="/register">
+            前台登記
+            <ExternalLink size={14} />
+          </a>
         </div>
         <nav className="flex gap-2 overflow-x-auto px-3 pb-3 lg:block lg:space-y-1">
           {tabs.map(([key, label, Icon]) => (

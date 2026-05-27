@@ -15,6 +15,7 @@ model RepairItem {
   itemName            String
   problemDescription  String
   photoUrl            String?
+  trackingCode        String?               @unique
   completionPreference String
   status              String                @default("PENDING")
   repairRecords       RepairRecord[]

@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+dist
+.git
+.gitignore
+.env
+*.db
+*.db-journal
+server/src/uploads/*
+!server/src/uploads/.gitkeep

@@ -12,6 +12,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
+    "prisma:seed": "node prisma/seed.js",
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
@@ -23,9 +24,10 @@
     "express": "^4.21.2",
     "lucide-react": "^0.468.0",
     "multer": "^1.4.5-lts.1",
-    "vite": "^5.4.11",
+    "qrcode": "^1.5.4",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.11"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
