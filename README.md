@@ -97,7 +97,13 @@ docker compose exec repair-system-app npm run prisma:seed
 
 ## 部署到 .240 主機
 
-以下以 `.240` 代表 `192.168.16.240`，部署網址預設為 `http://192.168.16.240:8240`。
+以下以 `.240` 代表 `192.168.16.240`，Docker 直連網址預設為 `http://192.168.16.240:8240`。
+
+目前正式網址：
+
+- 前台登記：https://repair.nghcc.org.tw/register
+- 後台系統：https://repair.nghcc.org.tw/admin
+- API：https://repair.nghcc.org.tw/api/dashboard/summary
 
 ### 1. SSH 登入 .240 主機
 
@@ -141,13 +147,19 @@ cat .env
 DATABASE_URL="file:/app/data/repair-system.db"
 PORT=4000
 HOST_PORT=8240
-CLIENT_ORIGIN=http://192.168.16.240:8240
+CLIENT_ORIGIN=https://repair.nghcc.org.tw
 ```
 
 ### 5. 啟動 Docker
 
 ```bash
 docker compose up -d --build
+```
+
+若只更新 `.env`，不需要 rebuild：
+
+```bash
+docker compose up -d
 ```
 
 ### 6. 查看 log
@@ -233,6 +245,59 @@ docker compose config
 ```
 
 確認 compose 使用的是 `repair-system-data` 與 `repair-system-uploads`。
+
+### 13. nginx / HTTPS 網域設定
+
+DNS 需先設定：
+
+```text
+repair.nghcc.org.tw A 125.229.223.194
+```
+
+.240 主機 nginx 反向代理設定檔：
+
+```bash
+sudo nano /etc/nginx/sites-available/repair.nghcc.org.tw.conf
+```
+
+內容：
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name repair.nghcc.org.tw;
+
+    client_max_body_size 20M;
+
+    location / {
+        proxy_pass http://127.0.0.1:8240;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+```
+
+啟用並測試：
+
+```bash
+sudo ln -sfn /etc/nginx/sites-available/repair.nghcc.org.tw.conf /etc/nginx/sites-enabled/repair.nghcc.org.tw.conf
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+申請 HTTPS 憑證並自動轉址：
+
+```bash
+sudo certbot --nginx -d repair.nghcc.org.tw --redirect
+sudo nginx -t
+sudo systemctl reload nginx
+```
 
 ## Prisma migrate / seed
 
