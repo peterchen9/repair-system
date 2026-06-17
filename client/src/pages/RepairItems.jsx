@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Edit3, Eye, Save } from "lucide-react";
 import { api, completionLabel, dateOnly, statusLabel, today, toFormData } from "../lib/api";
 import { Button, Empty, Panel, Section, StatusBadge } from "../components/UI.jsx";
-import QRCodeLabel from "../components/QRCodeLabel.jsx";
+import BarcodeLabel from "../components/BarcodeLabel.jsx";
 
 const blank = {
   receivedDate: today(),
@@ -128,7 +128,7 @@ export default function RepairItems({ refreshKey, onChanged }) {
       {selected && (
         <Panel>
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">單筆詳細資料與 QR Code</h3>
+            <h3 className="font-semibold">單筆詳細資料與 CODE128 條碼</h3>
             <Button variant="secondary" onClick={() => setSelected(null)}>關閉</Button>
           </div>
           <div className="mt-3 grid gap-4 md:grid-cols-[1fr_280px]">
@@ -142,7 +142,7 @@ export default function RepairItems({ refreshKey, onChanged }) {
               <Info label="故障問題" value={selected.problemDescription} />
               {selected.photoUrl && <img className="max-h-56 rounded-md border object-cover" src={selected.photoUrl} alt="待修品照片" />}
             </div>
-            <QRCodeLabel item={selected} />
+            <BarcodeLabel item={selected} />
           </div>
         </Panel>
       )}

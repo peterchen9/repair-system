@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { api, completionLabel, dateOnly } from "../lib/api";
 import { Button, Empty, Panel, StatusBadge } from "../components/UI.jsx";
-import QRCodeLabel from "../components/QRCodeLabel.jsx";
+import BarcodeLabel from "../components/BarcodeLabel.jsx";
 
 export default function TrackItem() {
   const [item, setItem] = useState(null);
@@ -45,7 +45,7 @@ export default function TrackItem() {
               </div>
               {item.photoUrl && <img className="mt-4 max-h-72 rounded-md border object-cover" src={item.photoUrl} alt="維修品照片" />}
             </Panel>
-            <QRCodeLabel item={item} />
+            <BarcodeLabel item={item} />
           </div>
         )}
       </main>

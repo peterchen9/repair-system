@@ -10,10 +10,29 @@ const includeAll = {
   statusHistories: { orderBy: { changedAt: "desc" } }
 };
 
-function makeTrackingCode() {
-  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  const random = Math.random().toString(36).slice(2, 8).toUpperCase();
-  return `RS-${stamp}-${random}`;
+function formatBarcodeTimestamp(date) {
+  const parts = new Intl.DateTimeFormat("zh-TW", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+    hour12: false
+  }).formatToParts(date);
+  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${value.year}${value.month}${value.day}${value.hour}${value.minute}${value.second}`;
+}
+
+async function makeUniqueTrackingCode(tx) {
+  for (let offset = 0; offset < 60; offset += 1) {
+    const code = formatBarcodeTimestamp(new Date(Date.now() + offset * 1000));
+    const existing = await tx.repairItem.findUnique({ where: { trackingCode: code } });
+    if (!existing) return code;
+  }
+  throw Object.assign(new Error("無法產生唯一條碼，請稍後再試"), { status: 409 });
 }
 
 function itemData(body, file) {
@@ -73,7 +92,8 @@ router.get("/:id", async (req, res, next) => {
 router.post("/", upload.single("photo"), async (req, res, next) => {
   try {
     const item = await prisma.$transaction(async (tx) => {
-      const created = await tx.repairItem.create({ data: { ...itemData(req.body, req.file), trackingCode: makeTrackingCode() } });
+      const trackingCode = await makeUniqueTrackingCode(tx);
+      const created = await tx.repairItem.create({ data: { ...itemData(req.body, req.file), trackingCode } });
       await tx.repairStatusHistory.create({
         data: { repairItemId: created.id, toStatus: created.status, changedBy: req.body.changedBy || "系統", reason: "建立待修品" }
       });
