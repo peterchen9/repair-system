@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Edit3, Eye, Save } from "lucide-react";
 import { api, completionLabel, dateOnly, statusLabel, today, toFormData } from "../lib/api";
 import { Button, Empty, Panel, Section, StatusBadge } from "../components/UI.jsx";
-import BarcodeLabel from "../components/BarcodeLabel.jsx";
+import QRCodeLabel from "../components/QRCodeLabel.jsx";
 
 const blank = {
   receivedDate: today(),
@@ -92,13 +92,13 @@ export default function RepairItems({ refreshKey, onChanged }) {
         <Panel>
           <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="font-semibold">待修品清單</h3>
-            <input className="sm:max-w-xs" placeholder="搜尋姓名、電話、品名、追蹤碼" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input className="sm:max-w-xs" placeholder="搜尋姓名、電話、品名或追蹤碼" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           {!filtered.length ? <Empty /> : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead className="bg-slate-50 text-slate-500">
-                  <tr><th className="p-2">日期</th><th className="p-2">品名</th><th className="p-2">姓名</th><th className="p-2">狀態</th><th className="p-2">操作</th></tr>
+                  <tr><th className="p-2">日期</th><th className="p-2">品項</th><th className="p-2">姓名</th><th className="p-2">狀態</th><th className="p-2">操作</th></tr>
                 </thead>
                 <tbody>
                   {filtered.map((item) => (
@@ -128,7 +128,7 @@ export default function RepairItems({ refreshKey, onChanged }) {
       {selected && (
         <Panel>
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">單筆詳細資料與 CODE128 條碼</h3>
+            <h3 className="font-semibold">單筆詳細資料與 QR Code 標籤</h3>
             <Button variant="secondary" onClick={() => setSelected(null)}>關閉</Button>
           </div>
           <div className="mt-3 grid gap-4 md:grid-cols-[1fr_280px]">
@@ -138,11 +138,11 @@ export default function RepairItems({ refreshKey, onChanged }) {
               <Info label="狀態" value={statusLabel[selected.status]} />
               <Info label="姓名" value={selected.customerName} />
               <Info label="電話" value={selected.customerPhone} />
-              <Info label="處理方式" value={completionLabel[selected.completionPreference]} />
+              <Info label="完成後處理" value={completionLabel[selected.completionPreference]} />
               <Info label="故障問題" value={selected.problemDescription} />
               {selected.photoUrl && <img className="max-h-56 rounded-md border object-cover" src={selected.photoUrl} alt="待修品照片" />}
             </div>
-            <BarcodeLabel item={selected} />
+            <QRCodeLabel item={selected} />
           </div>
         </Panel>
       )}

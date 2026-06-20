@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CheckCircle2, Send } from "lucide-react";
 import { api, today, toFormData } from "../lib/api";
 import { Button, Panel } from "../components/UI.jsx";
-import BarcodeLabel from "../components/BarcodeLabel.jsx";
+import QRCodeLabel from "../components/QRCodeLabel.jsx";
 
 const blank = {
   receivedDate: today(),
@@ -42,7 +42,7 @@ export default function PublicRegister() {
         <header className="rounded-lg bg-white px-4 py-5 shadow-sm">
           <h1 className="text-2xl font-bold leading-tight text-ink">重修舊好待修品登記</h1>
           <p className="mt-2 text-base leading-7 text-slate-600">
-            請填寫待修品資料，送出後會產生 CODE128 條碼，方便後續追蹤。
+            請填寫待修品資料，送出後會產生 QR Code 標籤，方便後續追蹤。
           </p>
         </header>
 
@@ -50,9 +50,9 @@ export default function PublicRegister() {
           <Panel>
             <div className="mb-4 rounded-md bg-emerald-50 p-3 text-emerald-800">
               <div className="flex items-center gap-2 font-semibold"><CheckCircle2 size={20} />登記完成</div>
-              <p className="mt-1 text-sm">初始狀態：待修。請保留或列印下方條碼。</p>
+              <p className="mt-1 text-sm">初始狀態：待修。請列印下方 30x30mm QR Code 標籤貼在維修品上。</p>
             </div>
-            <BarcodeLabel item={created} />
+            <QRCodeLabel item={created} />
           </Panel>
         )}
 

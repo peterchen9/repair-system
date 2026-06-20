@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { api, completionLabel, dateOnly } from "../lib/api";
 import { Button, Empty, Panel, StatusBadge } from "../components/UI.jsx";
-import BarcodeLabel from "../components/BarcodeLabel.jsx";
+import QRCodeLabel from "../components/QRCodeLabel.jsx";
 
 export default function TrackItem() {
   const [item, setItem] = useState(null);
@@ -10,9 +10,9 @@ export default function TrackItem() {
   const code = decodeURIComponent(window.location.pathname.replace("/track/", ""));
 
   useEffect(() => {
-    api.get(`/api/repair-items/tracking/${code}`)
+    api.get(`/api/repair-items/tracking/${encodeURIComponent(code)}`)
       .then((res) => setItem(res.data))
-      .catch(() => setError("找不到此追蹤碼"));
+      .catch(() => setError("查無此追蹤碼"));
   }, [code]);
 
   return (
@@ -45,7 +45,7 @@ export default function TrackItem() {
               </div>
               {item.photoUrl && <img className="mt-4 max-h-72 rounded-md border object-cover" src={item.photoUrl} alt="維修品照片" />}
             </Panel>
-            <BarcodeLabel item={item} />
+            <QRCodeLabel item={item} />
           </div>
         )}
       </main>

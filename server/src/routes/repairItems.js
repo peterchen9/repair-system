@@ -1,4 +1,5 @@
 const express = require("express");
+const crypto = require("crypto");
 const prisma = require("../lib/prisma");
 const upload = require("../lib/upload");
 const { parseDate, uploadUrl } = require("../lib/labels");
@@ -10,25 +11,9 @@ const includeAll = {
   statusHistories: { orderBy: { changedAt: "desc" } }
 };
 
-function formatBarcodeTimestamp(date) {
-  const parts = new Intl.DateTimeFormat("zh-TW", {
-    timeZone: "Asia/Taipei",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-    hour12: false
-  }).formatToParts(date);
-  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  return `${value.year}${value.month}${value.day}${value.hour}${value.minute}${value.second}`;
-}
-
 async function makeUniqueTrackingCode(tx) {
-  for (let offset = 0; offset < 60; offset += 1) {
-    const code = formatBarcodeTimestamp(new Date(Date.now() + offset * 1000));
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const code = `RS-${crypto.randomBytes(8).toString("hex").toUpperCase()}`;
     const existing = await tx.repairItem.findUnique({ where: { trackingCode: code } });
     if (!existing) return code;
   }
